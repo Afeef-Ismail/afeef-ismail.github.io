@@ -1,0 +1,1 @@
+﻿# Classification ML`n`nDecision Tree classification notebook using the bank marketing dataset, with preprocessing, train/test split, evaluation metrics, confusion matrix, ROC curve, and assignment report.

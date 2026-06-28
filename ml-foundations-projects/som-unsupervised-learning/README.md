@@ -1,0 +1,1 @@
+﻿# SOM Unsupervised Learning`n`nCompleted Self Organizing Map notebook using Parkinsons data, with preprocessing, SOM training, hit map/U-Matrix/component analysis, PCA, quantization error, topographic error, and report.

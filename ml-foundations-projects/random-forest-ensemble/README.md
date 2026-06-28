@@ -1,0 +1,1 @@
+﻿# Random Forest Ensemble`n`nCompleted Random Forest classification notebook using Adult Census Income data, with preprocessing pipelines, model training, evaluation metrics, confusion matrix, ROC curve, feature importance, and report.
