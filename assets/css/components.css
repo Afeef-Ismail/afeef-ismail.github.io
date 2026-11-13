@@ -602,8 +602,9 @@ kbd {
 }
 
 .now dt {
-  flex: 0 0 82px;
+  flex: 0 0 12ch;
   color: var(--accent);
+  white-space: nowrap;
 }
 
 .now dt::before {
