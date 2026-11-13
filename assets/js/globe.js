@@ -13,6 +13,7 @@
   const PERSPECTIVE = 0.3;
   const BADGE_SCALE = 0.052; /* badge radius as a fraction of the canvas size */
   const ICON_DIR = "assets/icons/";
+  const FRONT_BOOST = 0.1; /* extra size for badges at the very front */
   const GROUP_COLORS = ["94,234,212", "96,165,250", "167,139,250", "244,170,222", "251,191,36"];
 
   /** Evenly spreads `count` points over a unit sphere. */
@@ -24,6 +25,35 @@
       const theta = golden * i;
       return [Math.cos(theta) * ring, y, Math.sin(theta) * ring];
     });
+  }
+
+  /**
+   * Evens out spacing by letting the points repel each other along the sphere
+   * (like equal charges) until they settle. The spiral start is close already;
+   * this removes its tight and loose patches so neighbours sit the same distance apart.
+   */
+  function relaxSphere(start, iterations) {
+    let points = start;
+    for (let round = 0; round < iterations; round += 1) {
+      const stepSize = 0.12 * (1 - round / iterations) + 0.01;
+      points = points.map((p, i) => {
+        const force = [0, 0, 0];
+        points.forEach((q, j) => {
+          if (i === j) return;
+          const d = [p[0] - q[0], p[1] - q[1], p[2] - q[2]];
+          const distSq = d[0] * d[0] + d[1] * d[1] + d[2] * d[2] + 1e-6;
+          const push = 1 / (distSq * Math.sqrt(distSq));
+          force[0] += d[0] * push;
+          force[1] += d[1] * push;
+          force[2] += d[2] * push;
+        });
+        const scale = stepSize / points.length;
+        const moved = [p[0] + force[0] * scale, p[1] + force[1] * scale, p[2] + force[2] * scale];
+        const len = Math.hypot(moved[0], moved[1], moved[2]) || 1;
+        return [moved[0] / len, moved[1] / len, moved[2] / len];
+      });
+    }
+    return points;
   }
 
   function multiply(a, b) {
@@ -64,8 +94,11 @@
     if (!item.logo) return null;
     const image = new Image();
     image.decoding = "async";
+    const src = ICON_DIR + item.logo + ".svg";
     image.addEventListener("load", onReady);
-    image.src = ICON_DIR + item.logo + ".svg";
+    /* One retry for a dropped request; until it loads the badge shows its fallback glyph. */
+    image.addEventListener("error", () => setTimeout(() => (image.src = src + "?retry=1"), 900), { once: true });
+    image.src = src;
     return image;
   }
 
@@ -79,7 +112,7 @@
     if (!canvas || !canvas.getContext || !items || !items.length) return;
     const ctx = canvas.getContext("2d");
     const reduced = Boolean(options && options.reducedMotion);
-    const points = fibonacciSphere(items.length);
+    const points = relaxSphere(fibonacciSphere(items.length), 320);
     const dotPoints = fibonacciSphere(DOT_COUNT);
 
     let size = 0;
@@ -154,7 +187,8 @@
       const { item, p, index } = entry;
       const depth = (p.z + 1) / 2;
       const isHover = index === hovered;
-      const r = size * BADGE_SCALE * (0.6 + depth * 0.58) * (isHover ? 1.2 : 1);
+      /* Front-facing badges get an extra FRONT_BOOST, eased in over the nearest part of the globe. */
+      const r = size * BADGE_SCALE * (0.6 + depth * 0.58) * (1 + FRONT_BOOST * Math.pow(depth, 3)) * (isHover ? 1.2 : 1);
       const color = GROUP_COLORS[item.group % GROUP_COLORS.length];
 
       ctx.save();
