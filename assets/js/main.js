@@ -13,6 +13,20 @@
     }
   }
 
+  /**
+   * Describes one skill chip for the globe: its brand logo (data-logo) when it
+   * has one, plus the chip's own icon-font glyph as the fallback drawing.
+   */
+  function skillItem(chip, group) {
+    const iconEl = chip.querySelector("i");
+    const item = { label: chip.textContent.trim(), group, logo: chip.dataset.logo || "" };
+    if (!iconEl) return item;
+    const style = getComputedStyle(iconEl);
+    const char = getComputedStyle(iconEl, "::before").content.replace(/^["']|["']$/g, "");
+    if (!char || char === "none" || char === "normal") return item;
+    return { ...item, glyph: { char, weight: style.fontWeight, family: style.fontFamily } };
+  }
+
   function init() {
     const motion = { reducedMotion: PF.env.reducedMotion };
 
@@ -39,7 +53,7 @@
 
     safely("skills globe", () => {
       const skills = Array.from(document.querySelectorAll(".skill-group"), (group, index) =>
-        Array.from(group.querySelectorAll(".chips li"), (chip) => ({ label: chip.textContent.trim(), group: index }))
+        Array.from(group.querySelectorAll(".chips li"), (chip) => skillItem(chip, index))
       ).flat();
       PF.initGlobe(document.getElementById("skill-globe"), skills, motion);
     });

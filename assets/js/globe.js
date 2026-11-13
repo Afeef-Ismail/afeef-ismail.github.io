@@ -1,4 +1,4 @@
-/* Interactive skills globe: labels on a sphere that auto-rotates and can be dragged with inertia. */
+/* Interactive skills globe: logo badges on a sphere that auto-rotates and can be dragged with inertia. */
 (function () {
   "use strict";
 
@@ -11,6 +11,8 @@
   const MAX_SPEED = 9; /* rad/s cap after a hard flick */
   const DOT_COUNT = 340;
   const PERSPECTIVE = 0.3;
+  const BADGE_SCALE = 0.052; /* badge radius as a fraction of the canvas size */
+  const ICON_DIR = "assets/icons/";
   const GROUP_COLORS = ["94,234,212", "96,165,250", "167,139,250", "244,170,222", "251,191,36"];
 
   /** Evenly spreads `count` points over a unit sphere. */
@@ -23,8 +25,6 @@
       return [Math.cos(theta) * ring, y, Math.sin(theta) * ring];
     });
   }
-
-  const IDENTITY = [1, 0, 0, 0, 1, 0, 0, 0, 1];
 
   function multiply(a, b) {
     return [
@@ -59,16 +59,27 @@
   const rotate = (m, p) => [m[0] * p[0] + m[1] * p[1] + m[2] * p[2], m[3] * p[0] + m[4] * p[1] + m[5] * p[2], m[6] * p[0] + m[7] * p[1] + m[8] * p[2]];
   const clamp = (value, limit) => Math.max(-limit, Math.min(limit, value));
 
+  /** Starts loading an item's brand logo; returns null when it has none. */
+  function loadLogo(item, onReady) {
+    if (!item.logo) return null;
+    const image = new Image();
+    image.decoding = "async";
+    image.addEventListener("load", onReady);
+    image.src = ICON_DIR + item.logo + ".svg";
+    return image;
+  }
+
   /**
    * @param {HTMLCanvasElement} canvas
-   * @param {{label: string, group: number}[]} items
+   * @param {{label: string, group: number, logo?: string, glyph?: {char: string, weight: string, family: string}}[]} items
+   *   `logo` is a file name in assets/icons; `glyph` is the icon-font fallback used when there is no logo.
    * @param {{reducedMotion?: boolean}} options
    */
   PF.initGlobe = function initGlobe(canvas, items, options) {
     if (!canvas || !canvas.getContext || !items || !items.length) return;
     const ctx = canvas.getContext("2d");
     const reduced = Boolean(options && options.reducedMotion);
-    const labelPoints = fibonacciSphere(items.length);
+    const points = fibonacciSphere(items.length);
     const dotPoints = fibonacciSphere(DOT_COUNT);
 
     let size = 0;
@@ -84,6 +95,8 @@
     let visible = true;
     let frames = 0;
 
+    const logos = items.map((item) => loadLogo(item, () => !rafId && render()));
+
     function resize() {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       size = Math.min(canvas.clientWidth, canvas.clientHeight);
@@ -91,14 +104,14 @@
       canvas.width = Math.round(canvas.clientWidth * dpr);
       canvas.height = Math.round(canvas.clientHeight * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      radius = size * (items.length > 30 ? 0.35 : 0.39);
+      radius = size * 0.38;
       render();
     }
 
     function project(point) {
       const [x, y, z] = rotate(matrix, point);
       const scale = 1 + z * PERSPECTIVE;
-      return { x: canvas.clientWidth / 2 + x * radius * scale, y: canvas.clientHeight / 2 + y * radius * scale, z, scale };
+      return { x: canvas.clientWidth / 2 + x * radius * scale, y: canvas.clientHeight / 2 + y * radius * scale, z };
     }
 
     function drawSphere() {
@@ -123,44 +136,71 @@
       });
     }
 
-    function drawLabel(entry) {
+    function drawIcon(index, item, x, y, iconSize, color) {
+      const logo = logos[index];
+      if (logo && logo.complete && logo.naturalWidth) {
+        ctx.drawImage(logo, x - iconSize / 2, y - iconSize / 2, iconSize, iconSize);
+        return;
+      }
+      if (!item.glyph) return;
+      ctx.font = `${item.glyph.weight} ${(iconSize * 0.86).toFixed(1)}px ${item.glyph.family}`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = `rgb(${color})`;
+      ctx.fillText(item.glyph.char, x, y + iconSize * 0.03);
+    }
+
+    function drawBadge(entry) {
       const { item, p, index } = entry;
       const depth = (p.z + 1) / 2;
       const isHover = index === hovered;
-      const fontSize = Math.max(10, size * (items.length > 30 ? 0.0235 : 0.026)) * (0.72 + depth * 0.5) * (isHover ? 1.12 : 1);
-      const alpha = isHover ? 1 : 0.14 + Math.pow(depth, 1.6) * 0.86;
+      const r = size * BADGE_SCALE * (0.6 + depth * 0.58) * (isHover ? 1.2 : 1);
       const color = GROUP_COLORS[item.group % GROUP_COLORS.length];
 
-      ctx.font = `500 ${fontSize.toFixed(1)}px Inter, "Segoe UI", sans-serif`;
-      const textWidth = ctx.measureText(item.label).width;
-      const padX = fontSize * 0.75;
-      const dot = fontSize * 0.3;
-      const width = textWidth + padX * 2 + dot * 2 + 4;
-      const height = fontSize * 1.95;
-      const left = p.x - width / 2;
-      const top = p.y - height / 2;
-
-      if (p.z > 0.05 || isHover) {
-        ctx.beginPath();
-        if (ctx.roundRect) ctx.roundRect(left, top, width, height, height / 2);
-        else ctx.rect(left, top, width, height);
-        ctx.fillStyle = `rgba(9,11,18,${(isHover ? 0.95 : 0.78) * alpha})`;
-        ctx.fill();
-        ctx.strokeStyle = `rgba(${color},${(isHover ? 0.95 : 0.34) * alpha})`;
-        ctx.lineWidth = isHover ? 1.4 : 1;
-        ctx.stroke();
+      ctx.save();
+      ctx.globalAlpha = isHover ? 1 : 0.14 + Math.pow(depth, 1.5) * 0.86;
+      if (isHover) {
+        ctx.shadowColor = `rgba(${color},0.75)`;
+        ctx.shadowBlur = 22;
       }
-
-      ctx.fillStyle = `rgba(${color},${alpha})`;
       ctx.beginPath();
-      ctx.arc(left + padX + dot, p.y, dot, 0, Math.PI * 2);
+      ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(11,14,22,0.94)";
       ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = `rgba(${color},${isHover ? 1 : 0.5})`;
+      ctx.lineWidth = isHover ? 1.8 : 1.1;
+      ctx.stroke();
+      drawIcon(index, item, p.x, p.y, r * 1.12, color);
+      ctx.restore();
 
-      ctx.fillStyle = `rgba(233,237,245,${alpha})`;
+      return { index, x: p.x, y: p.y, r, z: p.z };
+    }
+
+    /** Name tag for the hovered badge, kept inside the canvas. */
+    function drawTooltip(box) {
+      const item = items[box.index];
+      const fontSize = Math.max(11, size * 0.03);
+      ctx.font = `600 ${fontSize.toFixed(1)}px Inter, "Segoe UI", sans-serif`;
+      ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(item.label, left + padX + dot * 2 + 4, p.y + 0.5);
+      const width = ctx.measureText(item.label).width + fontSize * 1.6;
+      const height = fontSize * 2;
+      const half = width / 2;
+      const x = Math.max(half + 4, Math.min(canvas.clientWidth - half - 4, box.x));
+      const above = box.y - box.r - height / 2 - 8;
+      const y = above - height / 2 < 4 ? box.y + box.r + height / 2 + 8 : above;
 
-      return { index, left, top, right: left + width, bottom: top + height, z: p.z };
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(x - half, y - height / 2, width, height, height / 2);
+      else ctx.rect(x - half, y - height / 2, width, height);
+      ctx.fillStyle = "rgba(9,11,18,0.96)";
+      ctx.fill();
+      ctx.strokeStyle = `rgba(${GROUP_COLORS[item.group % GROUP_COLORS.length]},0.9)`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.fillStyle = "#e9edf5";
+      ctx.fillText(item.label, x, y + 0.5);
     }
 
     function render() {
@@ -168,16 +208,18 @@
       ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
       drawSphere();
       boxes = items
-        .map((item, index) => ({ item, index, p: project(labelPoints[index]) }))
+        .map((item, index) => ({ item, index, p: project(points[index]) }))
         .sort((a, b) => a.p.z - b.p.z)
-        .map(drawLabel);
+        .map(drawBadge);
+      const active = boxes.find((box) => box.index === hovered);
+      if (active) drawTooltip(active);
     }
 
     function pickHovered() {
       if (!pointer || drag) return -1;
       for (let i = boxes.length - 1; i >= 0; i -= 1) {
         const box = boxes[i];
-        if (box.z > 0 && pointer.x >= box.left && pointer.x <= box.right && pointer.y >= box.top && pointer.y <= box.bottom) return box.index;
+        if (box.z > -0.1 && Math.hypot(pointer.x - box.x, pointer.y - box.y) <= box.r + 3) return box.index;
       }
       return -1;
     }
@@ -199,6 +241,7 @@
       last = now;
       step(dt);
       hovered = pickHovered();
+      canvas.classList.toggle("is-hovering", hovered >= 0);
       render();
       const idle = reduced && !drag && Math.abs(velocity.x) < 0.002 && Math.abs(velocity.y) < 0.002;
       rafId = idle ? 0 : requestAnimationFrame(frame);
@@ -221,6 +264,7 @@
     }
 
     canvas.addEventListener("pointerdown", (event) => {
+      pointer = localPoint(event);
       drag = { x: event.clientX, y: event.clientY, time: performance.now() };
       velocity = { x: 0, y: 0 };
       try {

@@ -535,6 +535,10 @@ kbd {
   -webkit-user-select: none;
 }
 
+.globe.is-hovering {
+  cursor: pointer;
+}
+
 .globe.is-dragging {
   cursor: grabbing;
 }
