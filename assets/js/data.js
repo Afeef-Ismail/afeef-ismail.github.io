@@ -8,6 +8,7 @@
 
   PF.filters = Object.freeze([
     { id: "all", label: "All" },
+    { id: "health", label: "Healthcare AI" },
     { id: "genai", label: "GenAI & RAG" },
     { id: "ml", label: "Classical ML" },
     { id: "cv", label: "Computer Vision" },
@@ -16,13 +17,93 @@
 
   PF.projects = Object.freeze([
     {
+      id: "summaryz",
+      wide: true,
+      cats: ["health", "genai"],
+      kicker: "Lifosys Digital Systems | Healthcare AI",
+      label: "Healthcare AI · Browser extension",
+      title: "SummaryZ HIS Bridge - Browser Extension",
+      role: "Design and development of the extension, its HIS adapters, and the backend integration.",
+      blurb: "Browser extension that connects Lifosys' AI discharge-summary product to hospital information systems without vendor integration or database access.",
+      image: IMG + "projects/summaryz-architecture.svg",
+      imageAlt: "Diagram: the HIS Bridge extension sits between a hospital system and SummaryZ",
+      images: [IMG + "projects/summaryz-architecture.svg"],
+      cardTags: ["TypeScript", "WXT (MV3)", "FastAPI", "Gemini"],
+      summary: "SummaryZ is Lifosys' AI discharge-summary product. The HIS Bridge is a browser extension that links it to a hospital's web-based information system: it reads the inpatient record, hands it to SummaryZ, and after the doctor signs, fills the summary back into the discharge form. It works through the browser, so the hospital needs no vendor integration and gives no database access.",
+      tags: ["TypeScript", "WXT (Manifest V3)", "React", "FastAPI", "pdf-lib", "Gemini API", "Vitest"],
+      features: [
+        "Per-HIS adapter packs, built and tested against OpenMRS, Bahmni, and OpenEMR.",
+        "Checks two patient identifiers before anything is written back.",
+        "Reads the saved fields back to verify the write, and leaves the final save to a person.",
+        "An alternate print-bridge approach captures records as PDFs and drives the summary wizard through a queued agent."
+      ],
+      required: [
+        "A way to work with many different hospital systems without changing any of them.",
+        "Safety rules suited to clinical data: identity checks, verification, and human sign-off.",
+        "An adapter format general enough to cover very different HIS interfaces.",
+        "A test suite that runs without a live hospital system."
+      ],
+      engineering: [
+        "Navigation is deterministic at runtime rather than decided by an LLM, because clinical writes need to be repeatable.",
+        "Built a fully autonomous Gemini function-calling agent as a comparison, to show the trade-off between the two approaches.",
+        "Unit-tested with Vitest."
+      ],
+      impact: [
+        "Lets a hospital use SummaryZ with no integration work on the HIS side.",
+        "Built at Lifosys Digital Systems; source code and screenshots are private."
+      ],
+      github: "",
+      privateNote: "Source is private: built at Lifosys Digital Systems."
+    },
+    {
+      id: "oxzygen",
+      wide: true,
+      cats: ["health", "genai"],
+      kicker: "Lifosys Digital Systems | Healthcare Platform",
+      label: "Healthcare AI · Full stack",
+      title: "Oxzygen - Hospital Operating System",
+      role: "Primary developer on the platform rebuild: database, web app, and AI features.",
+      blurb: "Multi-tenant hospital and clinic platform with AI assistance across the patient journey, from reception and kiosk to doctor and pharmacy. In active development.",
+      image: IMG + "projects/oxzygen-architecture.svg",
+      imageAlt: "Diagram: Oxzygen patient-journey modules on a web app, database and AI layer",
+      images: [IMG + "projects/oxzygen-architecture.svg"],
+      cardTags: ["Next.js", "PostgreSQL", "Gemini", "Local LLMs"],
+      summary: "Oxzygen is Lifosys' operating system for hospitals and clinics. I work on its rebuild: a multi-tenant web app covering hospital onboarding, reception, entrance kiosk, doctor, and pharmacy flows, with AI used wherever it reduces staff effort. It is in active development.",
+      tags: ["Next.js 14", "TypeScript", "PostgreSQL (Supabase)", "Row-Level Security", "Gemini API", "Gemini Live", "Ollama (MedGemma)", "Vitest", "Docker"],
+      features: [
+        "Hospital-specific rules are configured per hospital at onboarding rather than hard-coded.",
+        "Reception flow with duplicate-patient checks while typing and a live queue.",
+        "Entrance kiosk and doctor screen, with voice input where it saves time.",
+        "Medicine safety checks: allergy and interaction rules, backed by local models.",
+        "A separate voice-agent service for phone calls, built on Gemini Live."
+      ],
+      required: [
+        "Strict separation of each hospital's data in a shared database.",
+        "AI features that stay accurate and need few approval clicks from staff.",
+        "Local models for most AI tasks, so patient data stays inside the hospital's control.",
+        "Tests that run against a real database schema."
+      ],
+      engineering: [
+        "Tenant isolation is enforced in the database with row-level security, not only in application code.",
+        "Local-first AI: local models were benchmarked for accuracy and speed, and rule-based checks stay authoritative.",
+        "API inputs are schema-validated, and tests run against a throwaway Postgres built from the migrations."
+      ],
+      impact: [
+        "A real product being built for hospitals, covering the full outpatient journey.",
+        "Built at Lifosys Digital Systems; source code and screenshots are private."
+      ],
+      github: "",
+      privateNote: "Source is private: built at Lifosys Digital Systems."
+    },
+    {
       id: "agrivision",
       wide: true,
       cats: ["cv", "genai"],
       kicker: "National Hackathon | Computer Vision + Farmer Advisory",
       label: "Computer Vision · Hackathon",
       title: "AgriVision - Multimodal Crop Disease Detection",
-      blurb: "Hackathon-winning farmer advisory app: leaf disease detection, severity, LLM treatment plans, weather-aware spray timing, GPS validation, and voice guidance.",
+      role: "Model fine-tuning, FastAPI backend, and the LLM advisory pipeline.",
+      blurb: "Placed 4th at a national-level hackathon. Farmer advisory app: leaf disease detection, severity, LLM treatment plans, weather-aware spray timing, GPS validation, and voice guidance.",
       image: IMG + "agrivision.jpg",
       imageAlt: "Leaf image used for crop disease detection",
       cardTags: ["EfficientNet-B3", "FastAPI", "Groq", "Computer Vision"],
@@ -47,7 +128,7 @@
         "Used structured JSON from the LLM to keep recommendations machine-readable and frontend-friendly."
       ],
       impact: [
-        "Placed 4th nationally at Matrix Fusion 4.0.",
+        "Placed 4th at Matrix Fusion 4.0, a national-level hackathon.",
         "Brings ML, backend, product thinking, and real user constraints together in one system."
       ],
       github: "https://github.com/Afeef-Ismail/agrivision-MF4.0"
@@ -55,40 +136,43 @@
     {
       id: "traxio",
       wide: true,
-      cats: ["mobile", "ml"],
+      cats: ["mobile"],
       kicker: "NIT Calicut | KSRTC Telematics",
       label: "Mobile · Telemetry · R&D",
       title: "Traxio - KSRTC Driver Benchmarking App",
-      blurb: "Flutter telematics app developed at NIT Calicut for KSRTC driver behavior benchmarking using phone sensors, GPS segmentation, terrain detection, and scoring.",
+      role: "Flutter app development with a co-developer; implemented an existing research study's features and scoring on-device.",
+      blurb: "Flutter Android app built at NIT Calicut for KSRTC driver-behaviour research: 10 Hz GPS and motion capture, 100 m route segments, and on-device scoring against an existing study's master-driver profiles.",
       image: IMG + "projects/traxio-showcase.jpg",
       imageAlt: "Traxio mobile app screenshots showcase",
       images: ["traxio-dashboard.png", "traxio-live-trip.png", "traxio-map-route.png", "traxio-trip-summary.png", "traxio-history.png"].map((f) => IMG + "projects/" + f),
       cardTags: ["Flutter", "Sensors", "SQLite", "Telemetry"],
-      summary: "Traxio is a Flutter Android app built for smartphone-based bus driver benchmarking. It captures sensor and GPS data, breaks trips into 100-meter route windows, extracts a 120-feature signal profile, classifies terrain, and scores segments against master-driver benchmark patterns.",
-      tags: ["Flutter", "Dart", "sensors_plus", "geolocator", "SQLite", "Flutter Map", "Python backend", "scikit-learn"],
+      summary: "Traxio is a Flutter Android app for transport researchers, built during an R&D internship at CoE-AI, NIT Calicut. It collects vehicle motion data from phone sensors and implements driver benchmarking from an existing NIT Calicut PhD study: the study's 120 features are extracted on the phone for every 100-metre segment and scored against its master-driver profiles. The benchmarking research and the profiles come from that study; my work was the app.",
+      tags: ["Flutter", "Dart", "sensors_plus", "geolocator", "SQLite", "Flutter Map", "Provider", "FFT (scidart)"],
       features: [
-        "Samples accelerometer, gyroscope, and GPS data at 10 Hz with calibration before trip capture.",
-        "Segments routes into 100-meter windows using Haversine distance accumulation.",
-        "Extracts 120 time-domain and frequency-domain features from speed, acceleration, yaw rate, jerk, vertical velocity, and turning radius.",
-        "Classifies terrain as plain, uphill, or downhill before scoring against terrain-specific benchmarks.",
-        "Stores trip history locally and provides segment drill-down, live dashboard, route trail, and demo mode."
+        "Samples accelerometer, gyroscope, and GPS data at 10 Hz, with angle-aware sensor calibration before a trip.",
+        "Segments routes into 100-metre windows using Haversine distance accumulation.",
+        "Extracts the study's 120 time-domain and frequency-domain features on-device: 8 driving attributes with 15 features each.",
+        "Classifies terrain as plain, uphill, or downhill, then scores each segment against the study's terrain-specific master-driver profiles.",
+        "Lets researchers collect new driving data with CSV export and add newly found behaviour clusters through an admin panel.",
+        "Offline rule-based coaching in English, Malayalam, and Hindi, plus trip history, live dashboard, route trail, and a demo mode."
       ],
       required: [
         "A mobile app capable of sensor permissions, live GPS tracking, map rendering, and offline trip persistence.",
         "Signal processing logic for smoothing, FFT, statistical feature extraction, terrain classification, and scoring.",
-        "Benchmark tables or clustering backend to represent master-driver reference behavior.",
+        "Benchmark tables holding the study's master-driver reference profiles.",
         "A usable flow for real devices plus an emulator-friendly demo route for testing."
       ],
       engineering: [
-        "Research translated into a usable field app.",
+        "Signal processing runs on the phone in Dart: smoothing, FFT, and statistical feature extraction, covered by unit tests.",
         "Modular structure: sensor service, segmentation, terrain service, analytics, database, providers, and UI screens are separated.",
-        "An understandable scoring method: feature extraction, terrain matching, benchmark lookup, deviation calculation, and 0-100 normalization."
+        "Trip data is stored locally in an encrypted (AES-256) SQLite database."
       ],
       impact: [
-        "Combines mobile, data capture, signal processing, and applied analytics in one build.",
-        "Connects directly to a real transport domain through NIT Calicut and KSRTC."
+        "Turns existing research into a field tool that researchers can use to collect driving data.",
+        "Built for a real transport domain through NIT Calicut and KSRTC."
       ],
-      github: "https://github.com/Afeef-Ismail/Traxio_Tracking_App"
+      github: "",
+      privateNote: "Repository is private."
     },
     {
       id: "learnova",
@@ -96,6 +180,7 @@
       kicker: "AI Product | Local-first LMS",
       label: "GenAI · RAG · Full stack",
       title: "Learnova AI - Local-first AI LMS",
+      role: "Backend, RAG pipeline, async workers, and frontend integration.",
       blurb: "Private AI learning platform with RAG chat, summaries, MCQs, flashcards, YouTube ingest, auth, workers, vector search, and local Ollama models.",
       image: IMG + "projects/learnova-home.png",
       imageAlt: "Learnova AI home page screenshot",
@@ -132,6 +217,7 @@
       kicker: "Applied ML | Financial Risk",
       label: "Classical ML · Risk",
       title: "Fraud Detection in Financial Transactions",
+      role: "End to end: data preparation, modelling, tuning, and deployment.",
       blurb: "Production-style fraud detection workflow on 590k+ IEEE-CIS transactions with imbalance handling, clustering, XGBoost tuning, and Streamlit inference.",
       image: IMG + "projects/fraud-streamlit-1.jpg",
       imageAlt: "Fraud Detection Streamlit dashboard screenshot",
@@ -163,10 +249,11 @@
     },
     {
       id: "healthassist",
-      cats: ["genai"],
-      kicker: "GenAI Healthcare Assistant",
-      label: "GenAI · Healthcare",
+      cats: ["health", "genai"],
+      kicker: "GenAI Healthcare Assistant | Team Project",
+      label: "GenAI · Healthcare · Team project",
       title: "HealthAssist - Medical Chatbot",
+      role: "AI and backend development, as part of a team.",
       blurb: "Gemini-powered healthcare assistant for general health questions, consultation-style support, emergency guidance, and medical report summaries.",
       image: IMG + "projects/healthassist-chat.jpg",
       imageAlt: "HealthAssist chatbot screenshot",
@@ -202,6 +289,7 @@
       kicker: "RAG + Analytics | NITC Accident Data",
       label: "RAG · Private research",
       title: "NITC Accident Analysis Chatbot",
+      role: "RAG pipeline, deterministic numeric layer, and evaluation.",
       blurb: "Private internal RAG analytics system for accident-data question answering. Source code, screenshots, and data are withheld because the dataset is sensitive.",
       visual: { icon: "fa-solid fa-lock", text: "PRIVATE RAG" },
       cardTags: ["RAG", "FAISS", "Ollama", "Evaluation"],
@@ -236,6 +324,7 @@
       kicker: "Notebook Collection | Core ML Practice",
       label: "Classical ML · Notebooks",
       title: "ML Foundations Projects",
+      role: "All notebooks, experiments, and reports.",
       blurb: "A clean notebook collection covering classification, regression, random forests, feature importance, ROC curves, and SOM-based unsupervised learning.",
       visual: { icon: "fa-solid fa-flask-vial", text: "ML LAB" },
       cardTags: ["Scikit-learn", "Jupyter", "MiniSom", "Reports"],

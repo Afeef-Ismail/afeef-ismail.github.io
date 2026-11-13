@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="672" viewBox="0 0 1280 672" role="img" aria-labelledby="t d">
+  <title id="t">Oxzygen platform architecture</title>
+  <desc id="d">Patient journey modules from onboarding to pharmacy run on a Next.js web app. Below it sit a PostgreSQL database with row-level security per hospital and an AI layer of rules, local models and a voice agent.</desc>
+  <defs>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#ffffff" stroke-opacity=".045"/></pattern>
+    <radialGradient id="glowA" cx="20%" cy="10%" r="55%"><stop offset="0" stop-color="#60a5fa" stop-opacity=".2"/><stop offset="1" stop-color="#60a5fa" stop-opacity="0"/></radialGradient>
+    <radialGradient id="glowB" cx="85%" cy="95%" r="55%"><stop offset="0" stop-color="#5eead4" stop-opacity=".18"/><stop offset="1" stop-color="#5eead4" stop-opacity="0"/></radialGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#5eead4"/></marker>
+  </defs>
+  <rect width="1280" height="672" fill="#090c14"/>
+  <rect width="1280" height="672" fill="url(#grid)"/>
+  <rect width="1280" height="672" fill="url(#glowA)"/>
+  <rect width="1280" height="672" fill="url(#glowB)"/>
+
+  <g font-family="'Segoe UI', Arial, sans-serif" fill="#e9edf5">
+    <text x="640" y="92" text-anchor="middle" font-size="14" font-family="Consolas, monospace" fill="#5b6274">// patient journey</text>
+
+    <!-- Journey modules -->
+    <g font-size="18" font-weight="600" text-anchor="middle">
+      <rect x="130" y="116" width="176" height="64" rx="14" fill="#0f1420" stroke="#5eead4" stroke-opacity=".7" stroke-width="1.5"/>
+      <text x="218" y="155">Onboarding</text>
+      <rect x="341" y="116" width="176" height="64" rx="14" fill="#0f1420" stroke="#5eead4" stroke-opacity=".7" stroke-width="1.5"/>
+      <text x="429" y="155">Reception</text>
+      <rect x="552" y="116" width="176" height="64" rx="14" fill="#0f1420" stroke="#5eead4" stroke-opacity=".7" stroke-width="1.5"/>
+      <text x="640" y="155">Kiosk</text>
+      <rect x="763" y="116" width="176" height="64" rx="14" fill="#0f1420" stroke="#5eead4" stroke-opacity=".7" stroke-width="1.5"/>
+      <text x="851" y="155">Doctor</text>
+      <rect x="974" y="116" width="176" height="64" rx="14" fill="#0f1420" stroke="#5eead4" stroke-opacity=".7" stroke-width="1.5"/>
+      <text x="1062" y="155">Pharmacy</text>
+    </g>
+    <g fill="none" stroke="#5eead4" stroke-width="2">
+      <path d="M306 148H335" marker-end="url(#arrow)"/>
+      <path d="M517 148H546" marker-end="url(#arrow)"/>
+      <path d="M728 148H757" marker-end="url(#arrow)"/>
+      <path d="M939 148H968" marker-end="url(#arrow)"/>
+    </g>
+
+    <!-- Web app -->
+    <path d="M640 180V226" stroke="#ffffff" stroke-opacity=".25" stroke-width="2" stroke-dasharray="5 6"/>
+    <rect x="130" y="228" width="1020" height="104" rx="18" fill="#0f1420" stroke="#60a5fa" stroke-opacity=".7" stroke-width="1.5"/>
+    <text x="166" y="270" font-size="13" font-family="Consolas, monospace" fill="#60a5fa">WEB APP</text>
+    <text x="166" y="306" font-size="25" font-weight="600">Next.js app and API routes</text>
+    <text x="1114" y="290" text-anchor="end" font-size="16" fill="#8d95a8">schema-validated inputs · per-hospital configuration</text>
+
+    <!-- Database -->
+    <path d="M385 332V376" stroke="#ffffff" stroke-opacity=".25" stroke-width="2" stroke-dasharray="5 6"/>
+    <path d="M895 332V376" stroke="#ffffff" stroke-opacity=".25" stroke-width="2" stroke-dasharray="5 6"/>
+    <rect x="130" y="378" width="490" height="190" rx="18" fill="#0f1420" stroke="#a78bfa" stroke-opacity=".7" stroke-width="1.5"/>
+    <text x="166" y="420" font-size="13" font-family="Consolas, monospace" fill="#a78bfa">DATA</text>
+    <text x="166" y="456" font-size="25" font-weight="600">PostgreSQL</text>
+    <g font-size="16" fill="#c4cbdb">
+      <circle cx="172" cy="492" r="4" fill="#a78bfa"/><text x="188" y="497">Row-level security per hospital</text>
+      <circle cx="172" cy="524" r="4" fill="#a78bfa"/><text x="188" y="529">Rules and audit trail in the database</text>
+    </g>
+
+    <!-- AI layer -->
+    <rect x="660" y="378" width="490" height="190" rx="18" fill="#0f1420" stroke="#5eead4" stroke-opacity=".8" stroke-width="1.5"/>
+    <text x="696" y="420" font-size="13" font-family="Consolas, monospace" fill="#5eead4">AI LAYER</text>
+    <text x="696" y="456" font-size="25" font-weight="600">Local-first AI</text>
+    <g font-size="16" fill="#c4cbdb">
+      <circle cx="702" cy="492" r="4" fill="#5eead4"/><text x="718" y="497">Rule-based safety checks stay authoritative</text>
+      <circle cx="702" cy="524" r="4" fill="#5eead4"/><text x="718" y="529">Local models (MedGemma) · Gemini Live voice agent</text>
+    </g>
+  </g>
+</svg>

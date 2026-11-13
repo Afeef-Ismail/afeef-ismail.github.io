@@ -26,6 +26,7 @@
       el("p", { class: "project__cat", text: project.label }),
       el("h3", { text: project.title }),
       el("p", { text: project.blurb }),
+      project.role ? el("p", { class: "project__role" }, [el("b", { text: "My role: " }), document.createTextNode(project.role)]) : null,
       el("ul", { class: "tags" }, project.cardTags.map((tag) => el("li", { class: "tag", text: tag }))),
       el("div", { class: "project__foot" }, [more, github])
     ]);

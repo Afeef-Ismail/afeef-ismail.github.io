@@ -459,6 +459,26 @@
   line-height: 1.65;
 }
 
+.project__role {
+  margin-bottom: 16px;
+  padding-left: 12px;
+  border-left: 2px solid rgba(var(--accent-rgb), 0.5);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #b4bccd;
+}
+
+.project__role b {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.project__role--modal {
+  max-width: 800px;
+  margin-bottom: 20px;
+  font-size: 14.5px;
+}
+
 .project__foot {
   display: flex;
   align-items: center;
@@ -657,11 +677,11 @@
 
 .certs {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
 }
 
-.certs.is-collapsed .cert:nth-child(n + 9) {
+.certs.is-collapsed .cert:nth-child(n + 7) {
   display: none;
 }
 

@@ -112,12 +112,13 @@
           icon("fa-brands fa-github"),
           document.createTextNode(" View on GitHub")
         ])
-      : el("span", { class: "modal__note", text: "Source is private: this project uses confidential data." });
+      : el("span", { class: "modal__note", text: project.privateNote || "Source is private: this project uses confidential data." });
 
     return [
       el("p", { class: "modal__kicker", text: project.kicker }),
       el("h3", { class: "modal__title", id: "modal-title", text: project.title }),
       el("p", { class: "modal__summary", text: project.summary }),
+      project.role ? el("p", { class: "project__role project__role--modal" }, [el("b", { text: "My role: " }), document.createTextNode(project.role)]) : null,
       el("ul", { class: "tags" }, project.tags.map((tag) => el("li", { class: "tag", text: tag }))),
       gallery(project, lightbox),
       el("div", { class: "modal__grid" }, [

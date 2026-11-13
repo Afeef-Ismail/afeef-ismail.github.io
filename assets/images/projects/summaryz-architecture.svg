@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="672" viewBox="0 0 1280 672" role="img" aria-labelledby="t d">
+  <title id="t">SummaryZ HIS Bridge architecture</title>
+  <desc id="d">A browser extension sits between the hospital information system and SummaryZ. It reads the inpatient record, sends it to SummaryZ, and after the doctor signs, fills the summary back into the discharge form.</desc>
+  <defs>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#ffffff" stroke-opacity=".045"/></pattern>
+    <radialGradient id="glowA" cx="22%" cy="12%" r="55%"><stop offset="0" stop-color="#5eead4" stop-opacity=".2"/><stop offset="1" stop-color="#5eead4" stop-opacity="0"/></radialGradient>
+    <radialGradient id="glowB" cx="85%" cy="95%" r="55%"><stop offset="0" stop-color="#a78bfa" stop-opacity=".22"/><stop offset="1" stop-color="#a78bfa" stop-opacity="0"/></radialGradient>
+    <marker id="arrowT" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#5eead4"/></marker>
+    <marker id="arrowV" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#a78bfa"/></marker>
+  </defs>
+  <rect width="1280" height="672" fill="#090c14"/>
+  <rect width="1280" height="672" fill="url(#grid)"/>
+  <rect width="1280" height="672" fill="url(#glowA)"/>
+  <rect width="1280" height="672" fill="url(#glowB)"/>
+
+  <g font-family="'Segoe UI', Arial, sans-serif" fill="#e9edf5">
+    <!-- Hospital HIS -->
+    <rect x="130" y="196" width="250" height="220" rx="18" fill="#0f1420" stroke="#60a5fa" stroke-opacity=".6" stroke-width="1.5"/>
+    <text x="255" y="246" text-anchor="middle" font-size="13" font-family="Consolas, monospace" fill="#60a5fa">HOSPITAL</text>
+    <text x="255" y="290" text-anchor="middle" font-size="27" font-weight="600">Web-based HIS</text>
+    <text x="255" y="330" text-anchor="middle" font-size="16" fill="#8d95a8">OpenMRS · Bahmni</text>
+    <text x="255" y="354" text-anchor="middle" font-size="16" fill="#8d95a8">OpenEMR</text>
+    <text x="255" y="392" text-anchor="middle" font-size="13" font-family="Consolas, monospace" fill="#5b6274">no vendor integration</text>
+
+    <!-- Extension -->
+    <rect x="480" y="150" width="320" height="312" rx="18" fill="#0f1420" stroke="#5eead4" stroke-opacity=".8" stroke-width="1.5"/>
+    <text x="640" y="196" text-anchor="middle" font-size="13" font-family="Consolas, monospace" fill="#5eead4">BROWSER EXTENSION</text>
+    <text x="640" y="236" text-anchor="middle" font-size="27" font-weight="600">HIS Bridge</text>
+    <g font-size="16" fill="#c4cbdb">
+      <rect x="508" y="262" width="264" height="46" rx="10" fill="#141a28" stroke="#ffffff" stroke-opacity=".1"/>
+      <text x="640" y="291" text-anchor="middle">Per-HIS adapter pack</text>
+      <rect x="508" y="322" width="264" height="46" rx="10" fill="#141a28" stroke="#ffffff" stroke-opacity=".1"/>
+      <text x="640" y="351" text-anchor="middle">2-identifier patient check</text>
+      <rect x="508" y="382" width="264" height="46" rx="10" fill="#141a28" stroke="#ffffff" stroke-opacity=".1"/>
+      <text x="640" y="411" text-anchor="middle">Read-back verification</text>
+    </g>
+
+    <!-- SummaryZ -->
+    <rect x="900" y="196" width="250" height="220" rx="18" fill="#0f1420" stroke="#a78bfa" stroke-opacity=".7" stroke-width="1.5"/>
+    <text x="1025" y="246" text-anchor="middle" font-size="13" font-family="Consolas, monospace" fill="#a78bfa">LIFOSYS</text>
+    <text x="1025" y="290" text-anchor="middle" font-size="27" font-weight="600">SummaryZ</text>
+    <text x="1025" y="330" text-anchor="middle" font-size="16" fill="#8d95a8">AI discharge</text>
+    <text x="1025" y="354" text-anchor="middle" font-size="16" fill="#8d95a8">summaries</text>
+    <text x="1025" y="392" text-anchor="middle" font-size="13" font-family="Consolas, monospace" fill="#5b6274">doctor reviews + signs</text>
+
+    <!-- Arrows -->
+    <g fill="none" stroke-width="2">
+      <path d="M380 268H474" stroke="#5eead4" marker-end="url(#arrowT)"/>
+      <path d="M800 268H894" stroke="#5eead4" marker-end="url(#arrowT)"/>
+      <path d="M900 346H806" stroke="#a78bfa" marker-end="url(#arrowV)"/>
+      <path d="M480 346H386" stroke="#a78bfa" marker-end="url(#arrowV)"/>
+    </g>
+    <g font-size="13" font-family="Consolas, monospace" text-anchor="middle">
+      <text x="427" y="256" fill="#5eead4">1 read</text>
+      <text x="847" y="256" fill="#5eead4">2 send</text>
+      <text x="853" y="368" fill="#a78bfa">3 signed</text>
+      <text x="433" y="368" fill="#a78bfa">4 fill</text>
+    </g>
+
+    <!-- Footer strip -->
+    <rect x="330" y="508" width="620" height="50" rx="25" fill="#0f1420" stroke="#ffffff" stroke-opacity=".12"/>
+    <circle cx="362" cy="533" r="5" fill="#5eead4"/>
+    <text x="640" y="539" text-anchor="middle" font-size="16" fill="#c4cbdb">A person confirms the final save. Nothing is written unattended.</text>
+
+    <text x="640" y="100" text-anchor="middle" font-size="14" font-family="Consolas, monospace" fill="#5b6274">// how the bridge works</text>
+  </g>
+</svg>

@@ -4,7 +4,7 @@
 
   const PF = (window.PF = window.PF || {});
   const BOOT_KEY = "pf-booted";
-  const BOOT_MS = 1150;
+  const BOOT_MS = 800;
   const BOOT_STEPS = ["loading weights...", "compiling graph...", "warming up inference...", "ready."];
   const REVEAL_STAGGER_MS = 80;
 

@@ -122,6 +122,8 @@
     let drag = null;
     let pointer = null;
     let hovered = -1;
+    let pinned = -1; /* badge selected by a tap, for touch screens with no hover */
+    let travelled = 0;
     let boxes = [];
     let rafId = 0;
     let last = 0;
@@ -250,7 +252,8 @@
     }
 
     function pickHovered() {
-      if (!pointer || drag) return -1;
+      if (drag) return -1;
+      if (!pointer) return pinned;
       for (let i = boxes.length - 1; i >= 0; i -= 1) {
         const box = boxes[i];
         if (box.z > -0.1 && Math.hypot(pointer.x - box.x, pointer.y - box.y) <= box.r + 3) return box.index;
@@ -300,6 +303,7 @@
     canvas.addEventListener("pointerdown", (event) => {
       pointer = localPoint(event);
       drag = { x: event.clientX, y: event.clientY, time: performance.now() };
+      travelled = 0;
       velocity = { x: 0, y: 0 };
       try {
         canvas.setPointerCapture(event.pointerId);
@@ -319,6 +323,7 @@
       const now = performance.now();
       const dx = event.clientX - drag.x;
       const dy = event.clientY - drag.y;
+      travelled += Math.abs(dx) + Math.abs(dy);
       const dt = Math.max(0.008, (now - drag.time) / 1000);
       const ay = dx * DRAG_SENSITIVITY;
       const ax = -dy * DRAG_SENSITIVITY;
@@ -336,6 +341,8 @@
       /* A pause before letting go means "place it here", not "throw it". */
       if (performance.now() - drag.time > 90) velocity = { x: 0, y: 0 };
       drag = null;
+      /* A tap (no real movement) pins the badge under it; tapping empty space or dragging clears it. */
+      pinned = event.pointerType !== "mouse" && travelled < 8 ? pickHovered() : -1;
       canvas.classList.remove("is-dragging");
       if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
     }
